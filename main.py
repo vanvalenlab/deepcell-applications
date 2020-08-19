@@ -30,6 +30,8 @@ import os
 
 from skimage.external import tifffile
 
+import numpy as np
+
 import deepcell
 from deepcell.utils import get_image
 from deepcell.applications import MultiplexSegmentation
@@ -56,6 +58,24 @@ def run(infile, image_mpp=0.5, compartment='whole-cell'):
 
     # load the infile into a numpy array
     img = deepcell.utils.get_image(infile)
+
+    # validate correct shape of image
+    if len(img.shape) != 3:
+        raise ValueError('Invalid image shape. An image of shape {} was '
+                         'supplied, but the multiplex model expects of images '
+                         'of shape [height, widths, 2]'.format(img.shape))
+
+    # multi-channel tifs render better as channels first in ImageJ
+    if img.shape[0] == 2:
+        img = np.rollaxis(img, 0, 3)
+
+    elif img.shape[2] != 2:
+        raise ValueError('Invalid image shape. An image of shape {} was supplied, '
+                         'but the multiplex model expects images of shape'
+                         '[height, widths, 2]'.format(img.shape))
+
+    # Applications expect a batch dimension
+    img = np.expand_dims(img, axis=0)
 
     # create the multiplex segmentation
     app = MultiplexSegmentation()
