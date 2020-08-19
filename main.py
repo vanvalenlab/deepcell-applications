@@ -33,8 +33,6 @@ from skimage.external import tifffile
 import numpy as np
 
 import deepcell
-from deepcell.utils import get_image
-from deepcell.applications import MultiplexSegmentation
 
 
 def get_arg_parser():
@@ -78,7 +76,7 @@ def run(infile, image_mpp=0.5, compartment='whole-cell'):
     img = np.expand_dims(img, axis=0)
 
     # create the multiplex segmentation
-    app = MultiplexSegmentation()
+    app = deepcell.applications.MultiplexSegmentation()
 
     # run the prediction
     output = app.predict(img, image_mpp=image_mpp, compartment=compartment)
