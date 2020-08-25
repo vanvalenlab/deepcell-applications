@@ -27,6 +27,7 @@
 
 import argparse
 import os
+import timeit
 
 from skimage.external import tifffile
 
@@ -39,23 +40,50 @@ def get_arg_parser():
     """argument parser to consume command line arguments"""
     parser = argparse.ArgumentParser()
 
-    # Model Config args
-    parser.add_argument('infile', help='Image file to process.')
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Image file inputs
+    parser.add_argument('--nuclear-image', '-n', required=False,
+                        help=('Path to 2D single channel TIF file.'))
+
+    parser.add_argument('--membrane-image', '-m', required=False,
+                        help=('Path to 2D single channel TIF file. Optional. '
+                              'If not provided, membrane channel input to '
+                              'network is blank.'))
+
+    # Mask outputs
+    parser.add_argument('--output-directory', '-o',
+                        default=os.path.join(root_dir, 'output'),
+                        help='Directory where segmentation masks are saved.')
+    
+    parser.add_argument('--output-name', '-f', required=False,
+                        default='mask.tif',
+                        help='Name of output file.')
+
+    # Inference parameters
+    parser.add_argument('--compartment', '-c', default='whole-cell',
+                        choices=('nuclear', 'whole-cell'),
+                        help=('Passed as argument to the '
+                              'MultiplexSegmentation application.'))
+
+    parser.add_argument('--mpp', type=float, default=0.5,
+                        help='Input image microns-per-pixel.')
 
     return parser
 
 
-def run(infile, image_mpp=0.5, compartment='whole-cell'):
-    assert os.path.isfile(infile)
+def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='whole-cell'):
+    # load the input files into numpy arrays
+    nuclear_img = deepcell.utils.get_image(nuclear_path)
+    nuclear_img = np.expand_dims(nuclear_img, axis=-1)
 
-    # construct the output file path (append "_output" to the infile name)
-    outfile = os.path.join(
-        os.path.dirname(infile),
-        '{}_output.tif'.format(os.path.splitext(os.path.basename(infile))[0])
-    )
+    if membrane_path is not None:
+        membrane_img = deepcell.utils.get_image(membrane_path)
+        membrane_img = np.expand_dims(membrane_img, axis=-1)
+    else:
+        membrane_img = np.zeros(nuclear_img.shape, dtype=nuclear_img.dtype)
 
-    # load the infile into a numpy array
-    img = deepcell.utils.get_image(infile)
+    img = np.concatenate([nuclear_img, membrane_img], axis=-1)
 
     # validate correct shape of image
     if len(img.shape) != 3:
@@ -82,15 +110,37 @@ def run(infile, image_mpp=0.5, compartment='whole-cell'):
     output = app.predict(img, image_mpp=image_mpp, compartment=compartment)
 
     # save the output as a tiff
-    # TODO: channels first/last? What is desired output?
-    tifffile.imsave(outfile, output)
-
-    return outfile
+    tifffile.imsave(outpath, output)
 
 
 if __name__ == '__main__':
+    _ = timeit.default_timer()
+
     ARGS = get_arg_parser().parse_args()
 
-    OUTFILE = run(ARGS.infile)
+    # Check that the provided output directory exists, and is writable
+    if not os.path.isdir(ARGS.output_directory):
+        raise IOError(f'{ARGS.output_directory} is not a directory.')
+    if not os.access(ARGS.output_directory, os.W_OK | os.X_OK):
+        raise IOError(f'{ARGS.output_directory} is not writable.')
 
-    print(OUTFILE)
+    OUTFILE = os.path.join(ARGS.output_directory, ARGS.output_name)
+
+    # Check that the output path does not exist already
+    if os.path.exists(OUTFILE):
+        raise IOError(f'{OUTFILE} already exists!')
+
+    # Check that the input files exist
+    if not os.path.exists(ARGS.nuclear_image):
+        raise IOError(f'{ARGS.nuclear_image} does not exist!')
+
+    run(
+        outpath=OUTFILE,
+        nuclear_path=ARGS.nuclear_image,
+        membrane_path=ARGS.membrane_image,
+        image_mpp=ARGS.mpp,
+        compartment=ARGS.compartment
+    )
+
+    print('Wrote output file {} in {} s.'.format(
+        OUTFILE, timeit.default_timer() - _))
