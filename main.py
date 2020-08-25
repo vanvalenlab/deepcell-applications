@@ -55,7 +55,7 @@ def get_arg_parser():
     parser.add_argument('--output-directory', '-o',
                         default=os.path.join(root_dir, 'output'),
                         help='Directory where segmentation masks are saved.')
-    
+
     parser.add_argument('--output-name', '-f', required=False,
                         default='mask.tif',
                         help='Name of output file.')
