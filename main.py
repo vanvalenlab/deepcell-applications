@@ -43,7 +43,7 @@ def get_arg_parser():
     root_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Image file inputs
-    parser.add_argument('--nuclear-image', '-n', required=False,
+    parser.add_argument('--nuclear-image', '-n', required=True,
                         help=('Path to 2D single channel TIF file.'))
 
     parser.add_argument('--membrane-image', '-m', required=False,
