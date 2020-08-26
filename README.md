@@ -15,10 +15,16 @@ For Docker API version >= 1.40:
 ```bash
 export DATA_DIR=/path/to/data/dir
 export MOUNT_DIR=/data
-export IMAGE_FILE=example_image.tif
+export NUCLEAR_FILE=example_nuclear_image.tif
+export MEMBRANE_FILE=example_membrane_image.tif
 docker run -it --gpus 1 \
 -v $DATA_DIR:$MOUNT_DIR \
-vanvalenlab/deepcell-applications:latest $MOUNT_DIR/$IMAGE_FILE
+vanvalenlab/deepcell-applications:latest \
+  --nuclear-image $MOUNT_DIR/$NUCLEAR_FILE \
+  --membrane-image $MOUNT_DIR/$MEMBRANE_FILE \
+  --output-directory $MOUNT_DIR \
+  --output-name mask.tif \
+  --compartment whole-cell
 ```
 
 For Docker API version < 1.40:
@@ -26,8 +32,14 @@ For Docker API version < 1.40:
 ```bash
 export DATA_DIR=/path/to/data/dir
 export MOUNT_DIR=/data
-export IMAGE_FILE=example_image.tif
+export NUCLEAR_FILE=example_nuclear_image.tif
+export MEMBRANE_FILE=example_membrane_image.tif
 NV_GPU=0 nvidia-docker run -it \
 -v $DATA_DIR:$MOUNT_DIR \
-vanvalenlab/deepcell-applications:latest $MOUNT_DIR/$IMAGE_FILE
+vanvalenlab/deepcell-applications:latest \
+  --nuclear-image $MOUNT_DIR/$NUCLEAR_FILE \
+  --membrane-image $MOUNT_DIR/$MEMBRANE_FILE \
+  --output-directory $MOUNT_DIR \
+  --output-name mask.tif \
+  --compartment whole-cell
 ```
