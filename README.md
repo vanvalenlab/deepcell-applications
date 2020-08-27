@@ -2,10 +2,23 @@
 
 A template of how to create and combine deep learning workflows using `deepcell-tf` and Docker.
 
-## Run the Python script
+## Running the Python script
 
-An example Python script `main.py` is provided as an example deepcell.application workflow.
-It process Nuclear and Membrane stain images and saves an instance segmentation mask of either the whole cell or the nucleus.
+An example Python script `main.py` is provided as an example `deepcell.applications` workflow.
+
+### Script arguments
+
+This script uses `argparse` to process command line arguments. Below is a table summarizing the arguments and any defaults. For more information, use `python main.py --help`.
+
+| Name | Description | Default Value |
+| :--- | :--- | :--- |
+| `--nuclear-image` | **REQUIRED**: The path to a nuclear channel image. | `""` |
+| `--membrane-image` | The path to a membrane channel image. | `""` |
+| `--output-directory` | Directory to save output file. | `"./output"` |
+| `--output-name` | The name for the output file. | `"mask.tif"` |
+| `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
+
+### Script command
 
 ```bash
 export DATA_DIR=/path/to/data/dir
