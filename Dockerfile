@@ -12,4 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py .
 
+# Download and cache the model weights
+RUN python -c "import deepcell; deepcell.applications.MultiplexSegmentation()"
+
 ENTRYPOINT ["python", "main.py"]
