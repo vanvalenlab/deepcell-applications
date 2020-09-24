@@ -106,8 +106,22 @@ def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='w
     # create the multiplex segmentation
     app = deepcell.applications.MultiplexSegmentation()
 
+    whole_cell_kwargs = {'maxima_threshold': 0.1, 'maxima_model_smooth': 0,
+                         'interior_threshold': 0.3, 'interior_model_smooth': 2,
+                         'small_objects_threshold': 15,
+                         'fill_holes_threshold': 15,
+                         'radius': 2}
+
+    nuclear_kwargs = {'maxima_threshold': 0.1, 'maxima_model_smooth': 0,
+                      'interior_threshold': 0.3, 'interior_model_smooth': 2,
+                      'small_objects_threshold': 15,
+                      'fill_holes_threshold': 15,
+                      'radius': 2}
+
     # run the prediction
-    output = app.predict(img, image_mpp=image_mpp, compartment=compartment)
+    output = app.predict(img, image_mpp=image_mpp, compartment=compartment,
+                         postprocess_kwargs_whole_cell=whole_cell_kwargs,
+                         postprocess_kwargs_nuclear=nuclear_kwargs)
 
     # save the output as a tiff
     tifffile.imsave(outpath, output)
