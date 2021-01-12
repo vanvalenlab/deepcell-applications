@@ -1,3 +1,3 @@
+deepcell
 numpy
-scikit-image>=0.14.1,<=0.16.2
-deepcell-toolbox
+scikit-image<0.17.0
