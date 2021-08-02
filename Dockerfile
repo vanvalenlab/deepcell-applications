@@ -10,9 +10,9 @@ COPY requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
+COPY run_mesmer.py .
 
 # Download and cache the model weights
 RUN python -c "import deepcell; deepcell.applications.MultiplexSegmentation()"
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "run_mesmer.py"]
