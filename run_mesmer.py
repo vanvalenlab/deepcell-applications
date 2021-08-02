@@ -74,7 +74,7 @@ def get_arg_parser():
 
 def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='whole-cell'):
     # load the input files into numpy arrays
-    nuclear_img = deepcell.utils.get_image(nuclear_path)
+    nuclear_img = deepcell.utils.io_utils.get_image(nuclear_path)
     nuclear_img = np.expand_dims(nuclear_img, axis=-1)
 
     if membrane_path is not None:
