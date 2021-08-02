@@ -104,7 +104,7 @@ def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='w
     img = np.expand_dims(img, axis=0)
 
     # create the multiplex segmentation
-    app = deepcell.applications.MultiplexSegmentation()
+    app = deepcell.applications.Mesmer()
 
     whole_cell_kwargs = {'maxima_threshold': 0.1, 'maxima_model_smooth': 0,
                          'interior_threshold': 0.3, 'interior_model_smooth': 2,
