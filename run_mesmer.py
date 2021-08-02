@@ -78,7 +78,7 @@ def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='w
     nuclear_img = np.expand_dims(nuclear_img, axis=-1)
 
     if membrane_path is not None:
-        membrane_img = deepcell.utils.get_image(membrane_path)
+        membrane_img = deepcell.utils.io_utils.get_image(membrane_path)
         membrane_img = np.expand_dims(membrane_img, axis=-1)
     else:
         membrane_img = np.zeros(nuclear_img.shape, dtype=nuclear_img.dtype)
