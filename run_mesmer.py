@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Van Valen Lab at the California Institute of
+# Copyright 2016-2021 The Van Valen Lab at the California Institute of
 # Technology (Caltech), with support from the Paul Allen Family Foundation,
 # Google, & National Institutes of Health (NIH) under Grant U24CA224309-01.
 # All rights reserved.
@@ -26,105 +26,140 @@
 """An example script for Multiplex Segmentation using deepcell.applications."""
 
 import argparse
+import logging
 import os
+import sys
 import timeit
 
-from skimage.external import tifffile
-
 import numpy as np
+import tifffile
 
 import deepcell
+
+import dca
+from dca.io import load_image
 
 
 def get_arg_parser():
     """argument parser to consume command line arguments"""
+    root_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser()
 
-    root_dir = os.path.dirname(os.path.abspath(__file__))
+    # first, the arguments that are common to all applications
 
-    # Image file inputs
-    parser.add_argument('--nuclear-image', '-n', required=True,
-                        help=('Path to 2D single channel TIF file.'))
+    class WritableDirectoryAction(argparse.Action):
+        # Check that the provided output directory exists, and is writable
+        # From: https://gist.github.com/Tatsh/cc7e7217ae21745eb181
+        def __call__(self, parser, namespace, values, option_string=None):
+            prospective_dir = values
+            if not os.path.isdir(prospective_dir):
+                raise argparse.ArgumentTypeError(
+                    '{} is not a valid directory'.format(
+                        prospective_dir,))
+            if os.access(prospective_dir, os.W_OK | os.X_OK):
+                setattr(namespace, self.dest, os.path.realpath(prospective_dir))
+                return
+            raise argparse.ArgumentTypeError(
+                '{} is not a writable directory'.format(
+                    prospective_dir))
 
-    parser.add_argument('--membrane-image', '-m', required=False,
-                        help=('Path to 2D single channel TIF file. Optional. '
-                              'If not provided, membrane channel input to '
-                              'network is blank.'))
+    def existing_file(x):
+        if x is not None and not os.path.exists(x):
+            raise argparse.ArgumentTypeError('{} does not exist.'.format(x))
+        return x
 
-    # Mask outputs
     parser.add_argument('--output-directory', '-o',
                         default=os.path.join(root_dir, 'output'),
-                        help='Directory where segmentation masks are saved.')
+                        action=WritableDirectoryAction,
+                        help='Directory where application outputs are saved.')
 
     parser.add_argument('--output-name', '-f', required=False,
                         default='mask.tif',
                         help='Name of output file.')
 
-    # Inference parameters
-    parser.add_argument('--compartment', '-c', default='whole-cell',
-                        choices=('nuclear', 'whole-cell'),
-                        help=('Passed as argument to the '
-                              'MultiplexSegmentation application.'))
-
     parser.add_argument('--mpp', type=float, default=0.5,
-                        help='Input image microns-per-pixel.')
+                        help='Input image resolution in microns-per-pixel.')
+
+    parser.add_argument('-L', '--log-level', default='DEBUG',
+                        choices=('DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
+                        help='Only log the given level and above.')
+
+    # use subparsers to group options for different applications
+    # https://stackoverflow.com/a/30217387
+    subparsers = parser.add_subparsers(dest='app', help='application name')
+
+    # Mesmer options configuration:
+    mesmer_parser = subparsers.add_parser('mesmer', help='Run Mesmer')
+
+    # Image file inputs
+    mesmer_parser.add_argument('--nuclear-image', '-n', required=True,
+                               type=existing_file,
+                               help=('Path to 2D single channel TIF file.'))
+
+    mesmer_parser.add_argument('--nuclear-channel', '-nc', default=0, type=int,
+                               help='Channel to use of the nuclear image.')
+
+    mesmer_parser.add_argument('--membrane-image', '-m', required=False,
+                               type=existing_file,
+                               help=('Path to 2D single channel TIF file. '
+                                     'Optional. If not provided, membrane '
+                                     'channel input to network is blank.'))
+
+    mesmer_parser.add_argument('--membrane-channel', '-mc', default=0, type=int,
+                               help='Channel to use of the membrane image.')
+
+    # Inference parameters
+    mesmer_parser.add_argument('--compartment', '-c', default='whole-cell',
+                        choices=('nuclear', 'membrane', 'whole-cell'),
+                        help=('The cellular compartment to segment.'))
 
     return parser
 
 
-def run(outpath, nuclear_path, membrane_path=None, image_mpp=0.5, compartment='whole-cell'):
-    # load the input files into numpy arrays
-    nuclear_img = deepcell.utils.io_utils.get_image(nuclear_path)
-    nuclear_img = np.expand_dims(nuclear_img, axis=-1)
+def initialize_logger(log_level):
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
 
-    if membrane_path is not None:
-        membrane_img = deepcell.utils.io_utils.get_image(membrane_path)
-        membrane_img = np.expand_dims(membrane_img, axis=-1)
+    log_level = getattr(logging, log_level)
+
+    fmt = '[%(asctime)s]:[%(levelname)s]:[%(name)s]: %(message)s'
+    formatter = logging.Formatter(fmt=fmt)
+
+    console = logging.StreamHandler(stream=sys.stdout)
+    console.setFormatter(formatter)
+    console.setLevel(log_level)
+    logger.addHandler(console)
+
+
+def prepare_mesmer_input(nuclear_path, membrane_path=None, ndim=3,
+                         nuclear_channel=0, membrane_channel=0):
+    """Load and reshape image input files for the Mesmer application
+
+    Args:
+        nuclear_path (str): The path to the nuclear image file
+        membrane_path (str): The path to the membrane image file
+        ndim (int): Rank of the expected image size
+        nuclear_channel (int): The channel of the nuclear data,
+            if the image includes a channel axis.
+        membrane_channel (int): The channel of the membrane data,
+            if the image includes a channel axis.
+
+    Returns:
+        numpy.array: Single array of input images concatenated on channels.
+    """
+    # load the input files into numpy arrays
+    nuclear_img = load_image(nuclear_path, channel=nuclear_channel, ndim=ndim)
+
+    # membrane image is optional
+    if membrane_path:
+        membrane_img = load_image(membrane_path, channel=membrane_channel, ndim=ndim)
     else:
         membrane_img = np.zeros(nuclear_img.shape, dtype=nuclear_img.dtype)
 
+    # join the inputs in the correct order
     img = np.concatenate([nuclear_img, membrane_img], axis=-1)
 
-    # validate correct shape of image
-    if len(img.shape) != 3:
-        raise ValueError('Invalid image shape. An image of shape {} was '
-                         'supplied, but the multiplex model expects of images '
-                         'of shape [height, widths, 2]'.format(img.shape))
-
-    # multi-channel tifs render better as channels first in ImageJ
-    if img.shape[0] == 2:
-        img = np.rollaxis(img, 0, 3)
-
-    elif img.shape[2] != 2:
-        raise ValueError('Invalid image shape. An image of shape {} was supplied, '
-                         'but the multiplex model expects images of shape'
-                         '[height, widths, 2]'.format(img.shape))
-
-    # Applications expect a batch dimension
-    img = np.expand_dims(img, axis=0)
-
-    # create the multiplex segmentation
-    app = deepcell.applications.Mesmer()
-
-    whole_cell_kwargs = {'maxima_threshold': 0.1, 'maxima_model_smooth': 0,
-                         'interior_threshold': 0.3, 'interior_model_smooth': 2,
-                         'small_objects_threshold': 15,
-                         'fill_holes_threshold': 15,
-                         'radius': 2}
-
-    nuclear_kwargs = {'maxima_threshold': 0.1, 'maxima_model_smooth': 0,
-                      'interior_threshold': 0.3, 'interior_model_smooth': 2,
-                      'small_objects_threshold': 15,
-                      'fill_holes_threshold': 15,
-                      'radius': 2}
-
-    # run the prediction
-    output = app.predict(img, image_mpp=image_mpp, compartment=compartment,
-                         postprocess_kwargs_whole_cell=whole_cell_kwargs,
-                         postprocess_kwargs_nuclear=nuclear_kwargs)
-
-    # save the output as a tiff
-    tifffile.imsave(outpath, output)
+    return img
 
 
 if __name__ == '__main__':
@@ -132,11 +167,7 @@ if __name__ == '__main__':
 
     ARGS = get_arg_parser().parse_args()
 
-    # Check that the provided output directory exists, and is writable
-    if not os.path.isdir(ARGS.output_directory):
-        raise IOError(f'{ARGS.output_directory} is not a directory.')
-    if not os.access(ARGS.output_directory, os.W_OK | os.X_OK):
-        raise IOError(f'{ARGS.output_directory} is not writable.')
+    initialize_logger(log_level=ARGS.log_level)
 
     OUTFILE = os.path.join(ARGS.output_directory, ARGS.output_name)
 
@@ -144,17 +175,34 @@ if __name__ == '__main__':
     if os.path.exists(OUTFILE):
         raise IOError(f'{OUTFILE} already exists!')
 
-    # Check that the input files exist
-    if not os.path.exists(ARGS.nuclear_image):
-        raise IOError(f'{ARGS.nuclear_image} does not exist!')
+    app = dca.runner.get_app(ARGS.app)
 
-    run(
-        outpath=OUTFILE,
-        nuclear_path=ARGS.nuclear_image,
-        membrane_path=ARGS.membrane_image,
-        image_mpp=ARGS.mpp,
-        compartment=ARGS.compartment
-    )
+    # load the input image
+    if ARGS.app == 'mesmer':
+        # TODO: move into more parameterizable
+        image = prepare_mesmer_input(
+            nuclear_path=ARGS.nuclear_image,
+            membrane_path=ARGS.membrane_image,
+            ndim=len(app.model_image_shape),
+            nuclear_channel=ARGS.nuclear_channel,
+            membrane_channel=ARGS.membrane_channel,
+        )
 
-    print('Wrote output file {} in {} s.'.format(
-        OUTFILE, timeit.default_timer() - _))
+    else:
+        raise ValueError('invalid app: %s' % ARGS.app)
+
+    # make sure the input image is compatible with the app
+    dca.runner.validate_input(app, image, ARGS.app)
+
+    # Applications expect a batch dimension
+    image = np.expand_dims(image, axis=0)
+
+    # run the prediction
+    kwargs = dca.runner.get_predict_kwargs(ARGS)
+    output = app.predict(image, **kwargs)
+
+    # save the output as a tiff
+    tifffile.imsave(OUTFILE, output)
+
+    app.logger.info('Wrote output file %s in %s s.',
+                    OUTFILE, timeit.default_timer() - _)
