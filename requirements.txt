@@ -1,3 +1,3 @@
 deepcell
 numpy
-scikit-image<0.17.0
+tifffile
