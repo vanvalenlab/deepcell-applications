@@ -23,6 +23,7 @@ For more information, use `python run_app.py --help`.
 | `--nuclear-image` | **REQUIRED**: The path to a nuclear channel image. | `""` |
 | `--membrane-image` | The path to a membrane channel image. | `""` |
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
+| `--image-mpp` | The resolution of the image in microns-per-pixel. | `0.5` |
 
 ### Script command
 
