@@ -28,15 +28,14 @@ For more information, use `python run_app.py --help`.
 ### Script command
 
 ```bash
-export DATA_DIR=/path/to/data/dir
-export MOUNT_DIR=/data
+export DATA_DIR=/Users/Will/vanvalenlab/example_data/multiplex
 export APPLICATION=mesmer
 export NUCLEAR_FILE=example_nuclear_image.tif
 export MEMBRANE_FILE=example_membrane_image.tif
 python run_app.py $APPLICATION \
-  --nuclear-image $MOUNT_DIR/$NUCLEAR_FILE \
-  --membrane-image $MOUNT_DIR/$MEMBRANE_FILE \
-  --output-directory $MOUNT_DIR \
+  --nuclear-image $DATA_DIR/$NUCLEAR_FILE \
+  --membrane-image $DATA_DIR/$MEMBRANE_FILE \
+  --output-directory $DATA_DIR \
   --output-name mask.tif \
   --compartment whole-cell
 ```
@@ -89,8 +88,8 @@ For Docker API version < 1.40:
 export DATA_DIR=/path/to/data/dir
 export MOUNT_DIR=/data
 export APPLICATION=mesmer
-export NUCLEAR_FILE=DNA.tif
-export MEMBRANE_FILE=Membrane.tif
+export NUCLEAR_FILE=example_nuclear_image.tif
+export MEMBRANE_FILE=example_membrane_image.tif
 docker run -it \
   -v $DATA_DIR:$MOUNT_DIR \
   vanvalenlab/deepcell-applications:latest-gpu \
