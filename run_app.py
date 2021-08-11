@@ -129,43 +129,6 @@ def initialize_logger(log_level):
     logger.addHandler(console)
 
 
-def prepare_mesmer_input(nuclear_path, membrane_path=None, ndim=3,
-                         nuclear_channel=0, membrane_channel=0):
-    """Load and reshape image input files for the Mesmer application
-
-    Args:
-        nuclear_path (str): The path to the nuclear image file
-        membrane_path (str): The path to the membrane image file
-        ndim (int): Rank of the expected image size
-        nuclear_channel (int): The channel of the nuclear data,
-            if the image includes a channel axis.
-        membrane_channel (int): The channel of the membrane data,
-            if the image includes a channel axis.
-
-    Returns:
-        numpy.array: Single array of input images concatenated on channels.
-    """
-    # load the input files into numpy arrays
-    nuclear_img = dca.io.load_image(
-        nuclear_path,
-        channel=nuclear_channel,
-        ndim=ndim)
-
-    # membrane image is optional
-    if membrane_path:
-        membrane_img = dca.io.load_image(
-            membrane_path,
-            channel=membrane_channel,
-            ndim=ndim)
-    else:
-        membrane_img = np.zeros(nuclear_img.shape, dtype=nuclear_img.dtype)
-
-    # join the inputs in the correct order
-    img = np.concatenate([nuclear_img, membrane_img], axis=-1)
-
-    return img
-
-
 if __name__ == '__main__':
     _ = timeit.default_timer()
 
