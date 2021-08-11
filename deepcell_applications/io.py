@@ -32,12 +32,12 @@ from deepcell.utils.io_utils import get_image
 
 def load_image(path, channel=0, ndim=3):
     """Load an image file as a single-channel numpy array.
-    
+
     Args:
         path (str): Filepath to the image file to load.
         channel (int): Loads the given channel if available.
         ndim (int): The expected rank of the returned tensor.
-    
+
     Returns:
         numpy.array: The image channel loaded as an array.
     """
@@ -55,6 +55,7 @@ def load_image(path, channel=0, ndim=3):
         # use integer to select away the channel axis
         slc[axis] = channel
         img = img[slc]
+        print(img.shape)
 
     # expand the (proper) channel axis
     img = np.expand_dims(img, axis=-1)

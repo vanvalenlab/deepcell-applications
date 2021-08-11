@@ -36,8 +36,8 @@ import tifffile
 
 import deepcell
 
-import dca
-from dca.io import load_image
+import deepcell_applications as dca
+
 
 
 def get_arg_parser():
@@ -148,11 +148,17 @@ def prepare_mesmer_input(nuclear_path, membrane_path=None, ndim=3,
         numpy.array: Single array of input images concatenated on channels.
     """
     # load the input files into numpy arrays
-    nuclear_img = load_image(nuclear_path, channel=nuclear_channel, ndim=ndim)
+    nuclear_img = dca.io.load_image(
+        nuclear_path,
+        channel=nuclear_channel,
+        ndim=ndim)
 
     # membrane image is optional
     if membrane_path:
-        membrane_img = load_image(membrane_path, channel=membrane_channel, ndim=ndim)
+        membrane_img = dca.io.load_image(
+            membrane_path,
+            channel=membrane_channel,
+            ndim=ndim)
     else:
         membrane_img = np.zeros(nuclear_img.shape, dtype=nuclear_img.dtype)
 
