@@ -25,7 +25,7 @@
 # ==============================================================================
 """Functions for instantiating and running Applications"""
 
-import deepcell
+import deepcell_applications as dca
 
 
 def get_app(name, **kwargs):
@@ -39,11 +39,9 @@ def get_app(name, **kwargs):
         deepcell.applications.Application: The instantiated application
     """
     name = str(name).lower()
-    app_map = {
-        'mesmer': deepcell.applications.Mesmer,
-    }
+    app_map = dca.settings.VALID_APPLICATIONS
     try:
-        return app_map[name](**kwargs)
+        return app_map[name]['class'](**kwargs)
     except KeyError:
         raise ValueError('{} is not a valid application name. '
                          'Valid applications: {}'.format(
@@ -74,14 +72,15 @@ def get_predict_kwargs(args):
         dict: The parsed key-value pairs for ``app.predict``.
     """
     name = str(args.app).lower()
-    app_map = {
-        'mesmer': ['compartment'],
-    }
+    app_map = dca.settings.VALID_APPLICATIONS
+    predict_kwargs = dict()
     try:
-        predict_kwargs = {'image_mpp': args.mpp}
-        for k in app_map[name]:
+        for k in app_map[name]['predict_kwargs']:
             predict_kwargs[k] = getattr(args, k)
         return predict_kwargs
+    except AttributeError:
+        raise AttributeError('{} is required for {} jobs, but is not found'
+                             'in parsed CLI arguments.'.format(k, name))
     except KeyError:
         raise ValueError('{} is not a valid application name. '
                          'Valid applications: {}'.format(

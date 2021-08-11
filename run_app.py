@@ -181,11 +181,11 @@ if __name__ == '__main__':
     if os.path.exists(OUTFILE):
         raise IOError(f'{OUTFILE} already exists!')
 
-    app = dca.runner.get_app(ARGS.app)
+    app = dca.utils.get_app(ARGS.app)
 
     # load the input image
     if ARGS.app == 'mesmer':
-        # TODO: move into more parameterizable
+        # TODO: make more parameterizable
         image = prepare_mesmer_input(
             nuclear_path=ARGS.nuclear_image,
             membrane_path=ARGS.membrane_image,
@@ -198,13 +198,13 @@ if __name__ == '__main__':
         raise ValueError('invalid app: %s' % ARGS.app)
 
     # make sure the input image is compatible with the app
-    dca.runner.validate_input(app, image, ARGS.app)
+    dca.utils.validate_input(app, image, ARGS.app)
 
     # Applications expect a batch dimension
     image = np.expand_dims(image, axis=0)
 
     # run the prediction
-    kwargs = dca.runner.get_predict_kwargs(ARGS)
+    kwargs = dca.utils.get_predict_kwargs(ARGS)
     output = app.predict(image, **kwargs)
 
     # save the output as a tiff

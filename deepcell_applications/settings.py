@@ -23,9 +23,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Module for running different ``deepcell.applications``."""
+"""Settings and configurations for deepcell_applications"""
+
+from deepcell import applications as apps
 
 
-from deepcell_applications import io
-from deepcell_applications import utils
-from deepcell_applications import settings
+VALID_APPLICATIONS = {
+    'mesmer': {
+        'class': apps.Mesmer,
+        'predict_args': ['image_mpp', 'compartment'],
+    },
+}
