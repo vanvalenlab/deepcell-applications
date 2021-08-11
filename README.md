@@ -30,6 +30,7 @@ For more information, use `python run_app.py --help` or `python run_app.py APP_N
 | `--membrane-channel` | The channel of `membrane-image` to select. If multiple values are passed, the channels will be summed. | `0` |
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
 | `--image-mpp` | The resolution of the image in microns-per-pixel. | `0.5` |
+| `--batch-size` | Number of images to predict on per batch. | `4` |
 
 ### Script command
 
