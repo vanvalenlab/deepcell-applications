@@ -24,3 +24,6 @@
 # limitations under the License.
 # ==============================================================================
 """Module for running different ``deepcell.applications``."""
+
+from deepcell_applications import runner
+from deepcell_applications import io
