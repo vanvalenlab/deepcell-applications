@@ -54,8 +54,7 @@ def load_image(path, channel=0, ndim=3):
         slc = [slice(None)] * len(img.shape)
         # use integer to select away the channel axis
         slc[axis] = channel
-        img = img[slc]
-        print(img.shape)
+        img = img[tuple(slc)]
 
     # expand the (proper) channel axis
     img = np.expand_dims(img, axis=-1)
