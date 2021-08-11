@@ -35,7 +35,9 @@ def load_image(path, channel=0, ndim=3):
 
     Args:
         path (str): Filepath to the image file to load.
-        channel (int): Loads the given channel if available.
+        channel (list): Loads the given channel if available.
+            If channel is list of length > 1, each channel
+            will be summed.
         ndim (int): The expected rank of the returned tensor.
 
     Returns:
@@ -46,15 +48,20 @@ def load_image(path, channel=0, ndim=3):
 
     img = get_image(path)
 
+    channel = channel if isinstance(channel, (list, tuple)) else [channel]
+
     # getting a little tricky, which axis is channel axis?
     if img.ndim == ndim:
         # file includes channels, find the channel axis
+        # assuming the channels axis is the smallest dimension
         axis = img.shape.index(min(img.shape))
         # slice out only the required channel
         slc = [slice(None)] * len(img.shape)
-        # use integer to select away the channel axis
+        # use integer to select only the relevant channels
         slc[axis] = channel
         img = img[tuple(slc)]
+        # sum on the channel axis
+        img = img.sum(axis=axis)
 
     # expand the (proper) channel axis
     img = np.expand_dims(img, axis=-1)

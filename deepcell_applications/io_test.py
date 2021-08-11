@@ -44,22 +44,33 @@ def test_load_image(mocker):
     # test 3D image has correct image loaded
     channels = 3
     source = np.random.random((32, 32, channels))
+    mocker.patch('deepcell_applications.io.get_image', lambda x: source)
     for c in range(channels):
-        mocker.patch('deepcell_applications.io.get_image',
-                     lambda x: source)
         img = dca.io.load_image(path, channel=c, ndim=source.ndim)
         assert img.shape == (32, 32, 1)
         np.testing.assert_array_equal(img, source[..., c:c + 1])
 
+    # multiple channels can be selected using a list
+    channels = list(range(channels))
+    img = dca.io.load_image(path, channel=channels, ndim=source.ndim)
+    assert img.shape == (32, 32, 1)
+    np.testing.assert_array_equal(img[..., 0], source.sum(axis=-1))
+
     # test 3D image has correct image loaded (channels first)
+    channels = 3
     source = np.random.random((channels, 32, 32))
+    mocker.patch('deepcell_applications.io.get_image', lambda x: source)
     for c in range(channels):
-        mocker.patch('deepcell_applications.io.get_image',
-                     lambda x: source)
         img = dca.io.load_image(path, channel=c, ndim=source.ndim)
         assert img.shape == (32, 32, 1)
         expected = np.expand_dims(source[c], axis=-1)
         np.testing.assert_array_equal(img, expected)
+
+    # multiple channels can be selected using a list
+    channels = list(range(channels))
+    img = dca.io.load_image(path, channel=channels, ndim=source.ndim)
+    assert img.shape == (32, 32, 1)
+    np.testing.assert_array_equal(img[..., 0], source.sum(axis=0))
 
     # test too large of an image fails
     with pytest.raises(ValueError):

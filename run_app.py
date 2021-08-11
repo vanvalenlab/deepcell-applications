@@ -37,7 +37,6 @@ import tifffile
 import deepcell_applications as dca
 
 
-
 def get_arg_parser():
     """argument parser to consume command line arguments"""
     root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -94,13 +93,16 @@ def get_arg_parser():
     mesmer = subparsers.add_parser('mesmer', parents=[parent], add_help=False,
                                    help='Run Mesmer on nuclear + membrane data')
 
-    # Mesmer: Image file inputs
+    # Mesmer Image file inputs
     mesmer.add_argument('--nuclear-image', '-n', required=True,
                         type=existing_file, dest='nuclear_path',
                         help=('Path to 2D single channel TIF file.'))
 
-    mesmer.add_argument('--nuclear-channel', '-nc', default=0, type=int,
-                        help='Channel to use of the nuclear image.')
+    mesmer.add_argument('--nuclear-channel', '-nc',
+                        default=0, nargs='+', type=int,
+                        help='Channel(s) to use of the nuclear image. '
+                             'If more than one channel is passed, '
+                             'all channels will be summed.')
 
     mesmer.add_argument('--membrane-image', '-m', required=False,
                         type=existing_file, dest='membrane_path',
@@ -108,12 +110,15 @@ def get_arg_parser():
                                 'Optional. If not provided, membrane '
                                 'channel input to network is blank.'))
 
-    mesmer.add_argument('--membrane-channel', '-mc', default=0, type=int,
-                        help='Channel to use of the membrane image.')
+    mesmer.add_argument('--membrane-channel', '-mc',
+                        default=0, nargs='+', type=int,
+                        help='Channel(s) to use of the membrane image. '
+                             'If more than one channel is passed, '
+                             'all channels will be summed.')
 
-    # Mesmer: Inference parameters
+    # Mesmer Inference parameters
     mesmer.add_argument('--image-mpp', type=float, default=0.5,
-                               help='Input image resolution in microns-per-pixel.')
+                        help='Input image resolution in microns-per-pixel.')
 
     mesmer.add_argument('--compartment', '-c', default='whole-cell',
                         choices=('nuclear', 'membrane', 'whole-cell'),
@@ -141,9 +146,8 @@ if __name__ == '__main__':
     _ = timeit.default_timer()
 
     ARGS = get_arg_parser().parse_args()
-    if not ARGS.app:
-        print(ARGS)
-        sys.exit(1)
+
+    import pdb; pdb.set_trace()
 
     initialize_logger(log_level=ARGS.log_level)
 

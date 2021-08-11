@@ -25,7 +25,9 @@ For more information, use `python run_app.py --help` or `python run_app.py APP_N
 | `--output-directory` | Directory to save output file. | `"./output"` |
 | `--output-name` | The name for the output file. | `"mask.tif"` |
 | `--nuclear-image` | **REQUIRED**: The path to a nuclear channel image. | `""` |
-| `--membrane-image` | The path to a membrane channel image. | `""` |
+| `--nuclear-channel` | The channel of `nuclear-image` to select. If multiple values are passed, the channels will be summed. | `0` |
+| `--membrane-image` | The path to a membrane channel image. If not passed, an array of zeroes will be used instead. | `""` |
+| `--membrane-channel` | The channel of `membrane-image` to select. If multiple values are passed, the channels will be summed. | `0` |
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
 | `--image-mpp` | The resolution of the image in microns-per-pixel. | `0.5` |
 

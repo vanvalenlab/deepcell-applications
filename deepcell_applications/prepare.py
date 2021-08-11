@@ -46,10 +46,12 @@ def prepare_mesmer_input(nuclear_path, membrane_path=None, ndim=3,
         nuclear_path (str): The path to the nuclear image file
         membrane_path (str): The path to the membrane image file
         ndim (int): Rank of the expected image size
-        nuclear_channel (int): The channel of the nuclear data,
-            if the image includes a channel axis.
-        membrane_channel (int): The channel of the membrane data,
-            if the image includes a channel axis.
+        nuclear_channel (list): Integer or list of integers for the relevant
+            nuclear channels of the nuclear image data.
+            All channels will be summed into a single tensor.
+        membrane_channel (int): Integer or list of integers for the relevant
+            nuclear channels of the membrane image data.
+            All channels will be summed into a single tensor.
 
     Returns:
         numpy.array: Single array of input images concatenated on channels.
