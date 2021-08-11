@@ -1,4 +1,7 @@
 # deepcell-applications
+[![Build Status](https://github.com/vanvalenlab/deepcell-applications/workflows/build/badge.svg)](https://github.com/vanvalenlab/deepcell-applications/actions)
+[![Coverage Status](https://coveralls.io/repos/github/vanvalenlab/deepcell-applications/badge.svg?branch=master)](https://coveralls.io/github/vanvalenlab/deepcell-applications?branch=master)
+[![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/vanvalenlab/deepcell-applications/blob/master/LICENSE)
 
 A script and runnable Docker image for plugging DeepCell Applications (like `Mesmer`) into existing pipelines.
 
