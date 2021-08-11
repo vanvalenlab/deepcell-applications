@@ -28,6 +28,9 @@
 from deepcell import applications as apps
 
 
+# TODO: Add each new application to the dictionary
+# predict_options will be the configurable options
+# for ``app.predict`` that are exposed in run_app.py
 VALID_APPLICATIONS = {
     str(apps.Mesmer.__name__).lower(): {
         'class': apps.Mesmer,
