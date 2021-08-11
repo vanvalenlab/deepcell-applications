@@ -147,8 +147,6 @@ if __name__ == '__main__':
 
     ARGS = get_arg_parser().parse_args()
 
-    import pdb; pdb.set_trace()
-
     initialize_logger(log_level=ARGS.log_level)
 
     OUTFILE = os.path.join(ARGS.output_directory, ARGS.output_name)
