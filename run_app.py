@@ -77,7 +77,7 @@ def get_arg_parser():
                         default='mask.tif',
                         help='Name of output file.')
 
-    parser.add_argument('--mpp', type=float, default=0.5,
+    parser.add_argument('--image-mpp', type=float, default=0.5,
                         help='Input image resolution in microns-per-pixel.')
 
     parser.add_argument('-L', '--log-level', default='DEBUG',
