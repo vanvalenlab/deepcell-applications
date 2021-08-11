@@ -26,7 +26,6 @@
 """Tests for deepcell_applications.utils"""
 
 import numpy as np
-from numpy.lib.arraysetops import isin
 
 import pytest
 
