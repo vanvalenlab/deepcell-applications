@@ -1,4 +1,5 @@
 # deepcell-applications
+
 [![Build Status](https://github.com/vanvalenlab/deepcell-applications/workflows/build/badge.svg)](https://github.com/vanvalenlab/deepcell-applications/actions)
 [![Coverage Status](https://coveralls.io/repos/github/vanvalenlab/deepcell-applications/badge.svg?branch=master)](https://coveralls.io/github/vanvalenlab/deepcell-applications?branch=master)
 [![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/vanvalenlab/deepcell-applications/blob/master/LICENSE)
@@ -15,7 +16,7 @@ An example Python script `run_app.py` is provided as an example `deepcell.applic
 The first required argument to the script is the Application name: `python run_app.py APP_NAME`.
 Each supported application has a variety of different configuration arguments.
 Below is a table summarizing the currently supported applications and their arguments and any defaults.
-For more information, use `python run_app.py --help`.
+For more information, use `python run_app.py --help` or `python run_app.py APP_NAME --help`.
 
 #### Mesmer arguments
 
