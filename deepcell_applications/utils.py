@@ -48,9 +48,10 @@ def get_app(name, **kwargs):
                              name, list(app_map.keys())))
 
 
-def validate_input(app, img, name):
+def validate_input(app, img):
     # validate correct shape of image
     rank = len(app.model_image_shape)
+    name = app.__class__.__name__
     errtext = ('Invalid image shape. An image of shape {} was provided, but '
                '{} expects of images of shape [height, widths, {}]'.format(
                    img.shape, str(name).capitalize(), app.required_channels))

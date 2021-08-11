@@ -29,7 +29,7 @@ from deepcell import applications as apps
 
 
 VALID_APPLICATIONS = {
-    'mesmer': {
+    str(apps.Mesmer.__name__).lower(): {
         'class': apps.Mesmer,
         'predict_options': ['image_mpp', 'compartment'],
     },
