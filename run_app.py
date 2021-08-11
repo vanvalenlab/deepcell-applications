@@ -43,7 +43,9 @@ def get_arg_parser():
     root_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser()
 
-    # first, the arguments that are common to all applications
+    # Create a parent parser for common arguments
+    # https://stackoverflow.com/a/63283912
+    parent = argparse.ArgumentParser()
 
     class WritableDirectoryAction(argparse.Action):
         # Check that the provided output directory exists, and is writable
@@ -66,16 +68,16 @@ def get_arg_parser():
             raise argparse.ArgumentTypeError('{} does not exist.'.format(x))
         return x
 
-    parser.add_argument('--output-directory', '-o',
+    parent.add_argument('--output-directory', '-o',
                         default=os.path.join(root_dir, 'output'),
                         action=WritableDirectoryAction,
                         help='Directory where application outputs are saved.')
 
-    parser.add_argument('--output-name', '-f', required=False,
+    parent.add_argument('--output-name', '-f', required=False,
                         default='mask.tif',
                         help='Name of output file.')
 
-    parser.add_argument('-L', '--log-level', default='DEBUG',
+    parent.add_argument('-L', '--log-level', default='INFO',
                         choices=('DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
                         help='Only log the given level and above.')
 
@@ -83,31 +85,37 @@ def get_arg_parser():
     # https://stackoverflow.com/a/30217387
     subparsers = parser.add_subparsers(dest='app', help='application name')
 
-    # Mesmer options configuration:
-    mesmer_parser = subparsers.add_parser('mesmer', help='Run Mesmer')
+    # Next, each application is configured as its own subparser
+    # Each subparser should inherit from ``parent`` to inherit options
+    # Configurable inputs for ``prepare_input`` and ``app.predict`` must
+    # match (via name or dest) the function input names exactly.
 
-    # Image file inputs
-    mesmer_parser.add_argument('--nuclear-image', '-n', required=True,
-                               type=existing_file,
-                               help=('Path to 2D single channel TIF file.'))
+    # Mesmer Application Configuration
+    mesmer = subparsers.add_parser('mesmer', parents=[parent], add_help=False,
+                                   help='Run Mesmer on nuclear + membrane data')
 
-    mesmer_parser.add_argument('--nuclear-channel', '-nc', default=0, type=int,
-                               help='Channel to use of the nuclear image.')
+    # Mesmer: Image file inputs
+    mesmer.add_argument('--nuclear-image', '-n', required=True,
+                        type=existing_file, dest='nuclear_path',
+                        help=('Path to 2D single channel TIF file.'))
 
-    mesmer_parser.add_argument('--membrane-image', '-m', required=False,
-                               type=existing_file,
-                               help=('Path to 2D single channel TIF file. '
-                                     'Optional. If not provided, membrane '
-                                     'channel input to network is blank.'))
+    mesmer.add_argument('--nuclear-channel', '-nc', default=0, type=int,
+                        help='Channel to use of the nuclear image.')
 
-    mesmer_parser.add_argument('--membrane-channel', '-mc', default=0, type=int,
-                               help='Channel to use of the membrane image.')
+    mesmer.add_argument('--membrane-image', '-m', required=False,
+                        type=existing_file, dest='membrane_path',
+                        help=('Path to 2D single channel TIF file. '
+                                'Optional. If not provided, membrane '
+                                'channel input to network is blank.'))
 
-    # Inference parameters
-    mesmer_parser.add_argument('--image-mpp', type=float, default=0.5,
+    mesmer.add_argument('--membrane-channel', '-mc', default=0, type=int,
+                        help='Channel to use of the membrane image.')
+
+    # Mesmer: Inference parameters
+    mesmer.add_argument('--image-mpp', type=float, default=0.5,
                                help='Input image resolution in microns-per-pixel.')
 
-    mesmer_parser.add_argument('--compartment', '-c', default='whole-cell',
+    mesmer.add_argument('--compartment', '-c', default='whole-cell',
                         choices=('nuclear', 'membrane', 'whole-cell'),
                         help=('The cellular compartment to segment.'))
 
@@ -133,6 +141,9 @@ if __name__ == '__main__':
     _ = timeit.default_timer()
 
     ARGS = get_arg_parser().parse_args()
+    if not ARGS.app:
+        print(ARGS)
+        sys.exit(1)
 
     initialize_logger(log_level=ARGS.log_level)
 
@@ -144,8 +155,10 @@ if __name__ == '__main__':
 
     app = dca.utils.get_app(ARGS.app)
 
+    args_as_kwargs = dict(ARGS._get_kwargs())
+
     # load the input image
-    image = dca.prepare.prepare_input(ARGS.app, **dict(ARGS._get_kwargs()))
+    image = dca.prepare.prepare_input(ARGS.app, **args_as_kwargs)
 
     # make sure the input image is compatible with the app
     dca.utils.validate_input(app, image)
@@ -154,7 +167,7 @@ if __name__ == '__main__':
     image = np.expand_dims(image, axis=0)
 
     # run the prediction
-    kwargs = dca.utils.get_predict_kwargs(ARGS)
+    kwargs = dca.utils.get_predict_kwargs(args_as_kwargs)
     output = app.predict(image, **kwargs)
 
     # save the output as a tiff
