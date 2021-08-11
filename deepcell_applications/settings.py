@@ -31,6 +31,6 @@ from deepcell import applications as apps
 VALID_APPLICATIONS = {
     'mesmer': {
         'class': apps.Mesmer,
-        'predict_args': ['image_mpp', 'compartment'],
+        'predict_options': ['image_mpp', 'compartment'],
     },
 }

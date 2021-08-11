@@ -75,7 +75,7 @@ def get_predict_kwargs(args):
     app_map = dca.settings.VALID_APPLICATIONS
     predict_kwargs = dict()
     try:
-        for k in app_map[name]['predict_kwargs']:
+        for k in app_map[name]['predict_options']:
             predict_kwargs[k] = getattr(args, k)
         return predict_kwargs
     except AttributeError:
