@@ -18,6 +18,8 @@ Each supported application has a variety of different configuration arguments.
 Below is a table summarizing the currently supported applications and their arguments and any defaults.
 For more information, use `python run_app.py --help` or `python run_app.py APP_NAME --help`.
 
+To learn more about the pretrained models, see the [introductory documentation](https://github.com/vanvalenlab/intro-to-deepcell/tree/master/pretrained_models).
+
 #### Mesmer arguments
 
 | Name | Description | Default Value |
