@@ -13,6 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Download and cache the model weights
-RUN python -c "import deepcell_applications.settings.VALID_APPLICATIONS as A; [A[k]['class']() for k in A"
+RUN python -c "import deepcell_applications as dca; [v['class']() for v in dca.settings.VALID_APPLICATIONS.values()]"
 
 ENTRYPOINT ["python", "run_app.py"]
