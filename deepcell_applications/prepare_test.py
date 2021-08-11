@@ -37,6 +37,7 @@ def test_prepare_input():
     with pytest.raises(ValueError):
         dca.prepare.prepare_input('unknown app')
 
+
 def test_prepare_mesmer_input(mocker):
     # mock the application config in imported settings
     nuclear = np.random.random((32, 32, 1))
