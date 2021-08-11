@@ -63,26 +63,28 @@ def validate_input(app, img):
         raise ValueError(errtext)
 
 
-def get_predict_kwargs(args):
+def get_predict_kwargs(kwargs):
     """Returns a dictionary for use in ``app.predict``.
 
     Args:
-        args (argparse.Namespace): Parsed command-line arguments.
+        kwargs (dict): Parsed command-line arguments.
 
     Returns:
         dict: The parsed key-value pairs for ``app.predict``.
     """
-    name = str(args.app).lower()
+    name = str(kwargs.get('app')).lower()
     app_map = dca.settings.VALID_APPLICATIONS
     predict_kwargs = dict()
     try:
-        for k in app_map[name]['predict_options']:
-            predict_kwargs[k] = getattr(args, k)
-        return predict_kwargs
-    except AttributeError:
-        raise AttributeError('{} is required for {} jobs, but is not found'
-                             'in parsed CLI arguments.'.format(k, name))
+        app_options = app_map[name]['predict_options']
     except KeyError:
         raise ValueError('{} is not a valid application name. '
                          'Valid applications: {}'.format(
                              name, list(app_map.keys())))
+    for k in app_options:
+        try:
+            predict_kwargs[k] = kwargs[k]
+        except KeyError:
+            raise KeyError('{} is required for {} jobs, but is not found'
+                           'in parsed CLI arguments.'.format(k, name))
+    return predict_kwargs

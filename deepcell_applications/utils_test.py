@@ -25,6 +25,8 @@
 # ==============================================================================
 """Tests for deepcell_applications.utils"""
 
+import copy
+
 import numpy as np
 
 import pytest
@@ -114,22 +116,22 @@ def test_get_predict_kwargs(mocker):
 
     key = list(MOCKED_APPLICATIONS.keys())[0]
 
-    class MockNamespace():
-        app = key
-        test = True  # Namespace contains the attribute in MOCKED_APPLICATIONS
+    mock_namespace = {
+        'app': key,
+        'test': True
+    }
 
-    predict_kwargs = dca.utils.get_predict_kwargs(MockNamespace())
+    predict_kwargs = dca.utils.get_predict_kwargs(mock_namespace)
     assert predict_kwargs == {'test': True}
 
     # passed a bad name as `app`
     with pytest.raises(ValueError):
-        bad_namespace = MockNamespace()
-        bad_namespace.app = 'badname'
+        bad_namespace = copy.copy(mock_namespace)
+        bad_namespace['app'] = 'bad_name'
         _ = dca.utils.get_predict_kwargs(bad_namespace)
 
     # the argparser is misconfigured and not providing a required value
-    class MockMissingNamespace():
-        app = key
-
-    with pytest.raises(AttributeError):
-        _ = dca.utils.get_predict_kwargs(MockMissingNamespace())
+    with pytest.raises(KeyError):
+        bad_namespace = copy.copy(mock_namespace)
+        del bad_namespace['test']
+        _ = dca.utils.get_predict_kwargs(bad_namespace)
