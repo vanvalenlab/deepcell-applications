@@ -50,23 +50,14 @@ python run_app.py $APPLICATION \
 ## Using Docker
 
 The script can also be run as a Docker image for improved portability.
-
-### Build the image
-
 This repository has published versions for both CPU and GPU for each versioned release.
-However, it is easy to build a custom image to test any new functionality:
 
-```bash
-docker build -t vanvalenlab/deepcell-applications .
-```
+The latest images for each are readily available:
 
-It is also possible to change the base DeepCell version when building the image, using the build-arg `DEEPCELL_VERSION`.
-This makes it simple to build a CPU-only version of the image or to build a new version of `deepcell-tf`.
+* `vanvalenlab/deepcell-applications:latest` (CPU build)
+* `vanvalenlab/deepcell-applications:latest-gpu` (GPU build)
 
-```bash
-# the -gpu tag is required to enable GPU compatibility when overriding versions
-docker build --build-arg DEEPCELL_VERSION=0.9.0-gpu -t vanvalenlab/deepcell-applications .
-```
+Or for better reproducibility, use a versioned release (e.g. `vanvalenlab/deepcell-applications:0.1.0-gpu`)
 
 ### Run the image
 
@@ -106,4 +97,20 @@ docker run -it \
   --output-directory $MOUNT_DIR \
   --output-name mask.tif \
   --compartment whole-cell
+```
+
+### Build the image
+
+It is also very easy to build a custom image to test any new functionality:
+
+```bash
+docker build -t vanvalenlab/deepcell-applications .
+```
+
+It is also possible to change the base DeepCell version when building the image, using the build-arg `DEEPCELL_VERSION`.
+This makes it simple to build a CPU-only version of the image or to build a new version of `deepcell-tf`.
+
+```bash
+# the -gpu tag is required to enable GPU compatibility when overriding versions
+docker build --build-arg DEEPCELL_VERSION=0.9.0-gpu -t vanvalenlab/deepcell-applications .
 ```
