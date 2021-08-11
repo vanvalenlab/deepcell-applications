@@ -75,9 +75,6 @@ def get_arg_parser():
                         default='mask.tif',
                         help='Name of output file.')
 
-    parser.add_argument('--image-mpp', type=float, default=0.5,
-                        help='Input image resolution in microns-per-pixel.')
-
     parser.add_argument('-L', '--log-level', default='DEBUG',
                         choices=('DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
                         help='Only log the given level and above.')
@@ -107,6 +104,9 @@ def get_arg_parser():
                                help='Channel to use of the membrane image.')
 
     # Inference parameters
+    mesmer_parser.add_argument('--image-mpp', type=float, default=0.5,
+                               help='Input image resolution in microns-per-pixel.')
+
     mesmer_parser.add_argument('--compartment', '-c', default='whole-cell',
                         choices=('nuclear', 'membrane', 'whole-cell'),
                         help=('The cellular compartment to segment.'))
