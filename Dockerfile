@@ -10,9 +10,9 @@ COPY requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY run_mesmer.py .
+COPY . .
 
 # Download and cache the model weights
-RUN python -c "import deepcell; deepcell.applications.Mesmer()"
+RUN python -c "import deepcell_applications.settings.VALID_APPLICATIONS as A; [A[k]['class']() for k in A"
 
-ENTRYPOINT ["python", "run_mesmer.py"]
+ENTRYPOINT ["python", "run_app.py"]
