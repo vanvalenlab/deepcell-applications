@@ -34,8 +34,6 @@ import timeit
 import numpy as np
 import tifffile
 
-import deepcell
-
 import deepcell_applications as dca
 
 
@@ -184,21 +182,10 @@ if __name__ == '__main__':
     app = dca.utils.get_app(ARGS.app)
 
     # load the input image
-    if ARGS.app == 'mesmer':
-        # TODO: make more parameterizable
-        image = prepare_mesmer_input(
-            nuclear_path=ARGS.nuclear_image,
-            membrane_path=ARGS.membrane_image,
-            ndim=len(app.model_image_shape),
-            nuclear_channel=ARGS.nuclear_channel,
-            membrane_channel=ARGS.membrane_channel,
-        )
-
-    else:
-        raise ValueError('invalid app: %s' % ARGS.app)
+    image = dca.prepare.prepare_input(ARGS.app, **dict(ARGS._get_kwargs()))
 
     # make sure the input image is compatible with the app
-    dca.utils.validate_input(app, image, ARGS.app)
+    dca.utils.validate_input(app, image)
 
     # Applications expect a batch dimension
     image = np.expand_dims(image, axis=0)
