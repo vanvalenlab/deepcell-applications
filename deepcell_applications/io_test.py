@@ -78,6 +78,12 @@ def test_load_image(mocker):
                      lambda x: np.random.random((30, 32, 32, 1)))
         _ = dca.io.load_image(path, channel=0, ndim=3)
 
+    # test channels out of range throws error
+    with pytest.raises(ValueError):
+        mocker.patch('deepcell_applications.io.get_image',
+                     lambda x: np.random.random((32, 32, 1)))
+        _ = dca.io.load_image(path, channel=[0, 4], ndim=3)
+
     # Test invalid (falsey) values raise IOError
     bad_values = [None, '', False]
     for bad_value in bad_values:

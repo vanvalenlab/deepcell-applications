@@ -55,6 +55,11 @@ def load_image(path, channel=0, ndim=3):
         # file includes channels, find the channel axis
         # assuming the channels axis is the smallest dimension
         axis = img.shape.index(min(img.shape))
+        if max(channel) >= img.shape[axis]:
+            raise ValueError('Channel {} was passed but channel axis is '
+                             'only size {}'.format(
+                                 max(channel), img.shape[axis]))
+
         # slice out only the required channel
         slc = [slice(None)] * len(img.shape)
         # use integer to select only the relevant channels
