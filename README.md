@@ -43,7 +43,9 @@ export NUCLEAR_FILE=example_nuclear_image.tif
 export MEMBRANE_FILE=example_membrane_image.tif
 python run_app.py $APPLICATION \
   --nuclear-image $DATA_DIR/$NUCLEAR_FILE \
+  --nuclear-channel 0 \
   --membrane-image $DATA_DIR/$MEMBRANE_FILE \
+  --membrane-channel 0 1 \
   --output-directory $DATA_DIR \
   --output-name mask.tif \
   --compartment whole-cell
