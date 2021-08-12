@@ -72,7 +72,7 @@ def get_arg_parser():
                         action=WritableDirectoryAction,
                         help='Directory where application outputs are saved.')
 
-    parent.add_argument('--output-name', '-f', required=False,
+    parent.add_argument('--output-name', '-f',
                         default='mask.tif',
                         help='Name of output file.')
 
@@ -96,7 +96,7 @@ def get_arg_parser():
     # Mesmer Image file inputs
     mesmer.add_argument('--nuclear-image', '-n', required=True,
                         type=existing_file, dest='nuclear_path',
-                        help=('Path to 2D single channel TIF file.'))
+                        help=('REQUIRED: Path to 2D single channel TIF file.'))
 
     mesmer.add_argument('--nuclear-channel', '-nc',
                         default=0, nargs='+', type=int,
@@ -104,7 +104,7 @@ def get_arg_parser():
                              'If more than one channel is passed, '
                              'all channels will be summed.')
 
-    mesmer.add_argument('--membrane-image', '-m', required=False,
+    mesmer.add_argument('--membrane-image', '-m',
                         type=existing_file, dest='membrane_path',
                         help=('Path to 2D single channel TIF file. '
                               'Optional. If not provided, membrane '
