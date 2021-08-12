@@ -26,10 +26,10 @@ To learn more about the pretrained models, see the [introductory documentation](
 | :--- | :--- | :--- |
 | `--output-directory` | Directory to save output file. | `"./output"` |
 | `--output-name` | The name for the output file. | `"mask.tif"` |
-| `--nuclear-image` | **REQUIRED**: The path to a nuclear channel image. | `""` |
-| `--nuclear-channel` | The channel of `nuclear-image` to select. If multiple values are passed, the channels will be summed. | `0` |
-| `--membrane-image` | The path to a membrane channel image. If not passed, an array of zeroes will be used instead. | `""` |
-| `--membrane-channel` | The channel of `membrane-image` to select. If multiple values are passed, the channels will be summed. | `0` |
+| `--nuclear-image` | **REQUIRED**: The path to an image containing the nuclear marker(s). | `""` |
+| `--nuclear-channel` | The numerical index of the channel(s) from `nuclear-image` to select. If multiple values are passed, the channels will be summed. | `0` |
+| `--membrane-image` | The path to an image containing the membrane marker(s). If not passed, an array of zeroes will be used instead. | `""` |
+| `--membrane-channel` | The numerical index of the channel(s) from `membrane-image` to select. If multiple values are passed, the channels will be summed. | `0` |
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
 | `--image-mpp` | The resolution of the image in microns-per-pixel. A value of 0.5 corresponds to 20x zoom. | `0.5` |
 | `--batch-size` | Number of images to predict on per batch. | `4` |
