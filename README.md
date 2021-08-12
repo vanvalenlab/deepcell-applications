@@ -31,7 +31,7 @@ To learn more about the pretrained models, see the [introductory documentation](
 | `--membrane-image` | The path to a membrane channel image. If not passed, an array of zeroes will be used instead. | `""` |
 | `--membrane-channel` | The channel of `membrane-image` to select. If multiple values are passed, the channels will be summed. | `0` |
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
-| `--image-mpp` | The resolution of the image in microns-per-pixel. | `0.5` |
+| `--image-mpp` | The resolution of the image in microns-per-pixel. A value of 0.5 corresponds to 20x zoom. | `0.5` |
 | `--batch-size` | Number of images to predict on per batch. | `4` |
 
 ### Script command
