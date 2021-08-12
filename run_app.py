@@ -107,8 +107,8 @@ def get_arg_parser():
     mesmer.add_argument('--membrane-image', '-m', required=False,
                         type=existing_file, dest='membrane_path',
                         help=('Path to 2D single channel TIF file. '
-                                'Optional. If not provided, membrane '
-                                'channel input to network is blank.'))
+                              'Optional. If not provided, membrane '
+                              'channel input to network is blank.'))
 
     mesmer.add_argument('--membrane-channel', '-mc',
                         default=0, nargs='+', type=int,
@@ -118,7 +118,8 @@ def get_arg_parser():
 
     # Mesmer Inference parameters
     mesmer.add_argument('--image-mpp', type=float, default=0.5,
-                        help='Input image resolution in microns-per-pixel.')
+                        help='Input image resolution in microns-per-pixel. '
+                             'Default value of 0.5 corresponds to a 20x zoom.')
     
     mesmer.add_argument('--batch-size', '-b', default=4, type=int,
                         help='Batch size for `model.predict`.')
