@@ -80,6 +80,9 @@ def get_arg_parser():
                         choices=('DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
                         help='Only log the given level and above.')
 
+    parser.add_argument('--squeeze', action='store_true',
+                        help='Squeeze the output tensor before saving.')
+
     # use subparsers to group options for different applications
     # https://stackoverflow.com/a/30217387
     subparsers = parser.add_subparsers(dest='app', help='application name')
@@ -175,6 +178,10 @@ if __name__ == '__main__':
     # run the prediction
     kwargs = dca.utils.get_predict_kwargs(args_as_kwargs)
     output = app.predict(image, **kwargs)
+
+    # Optinally squeeze the output
+    if ARGS.squeeze:
+        output = np.squeeze(output)
 
     # save the output as a tiff
     tifffile.imsave(OUTFILE, output)
