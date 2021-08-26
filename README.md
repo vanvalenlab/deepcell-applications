@@ -33,6 +33,7 @@ To learn more about the pretrained models, see the [introductory documentation](
 | `--compartment` | Predict nuclear or whole-cell segmentation. | `"whole-cell"` |
 | `--image-mpp` | The resolution of the image in microns-per-pixel. A value of 0.5 corresponds to 20x zoom. | `0.5` |
 | `--batch-size` | Number of images to predict on per batch. | `4` |
+| `--squeeze` | Whether to `np.squeeze` the outputs before saving as a tiff. | `False` |
 
 ### Script command
 
