@@ -1,6 +1,6 @@
 # Use vanvalenlab/deepcell-tf as the base image
 # Change the build arg to edit the base image version.
-ARG DEEPCELL_VERSION=0.9.2-gpu
+ARG DEEPCELL_VERSION=0.10.0-gpu
 
 FROM vanvalenlab/deepcell-tf:${DEEPCELL_VERSION}
 
