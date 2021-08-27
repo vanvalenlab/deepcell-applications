@@ -80,7 +80,7 @@ def get_arg_parser():
                         choices=('DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
                         help='Only log the given level and above.')
 
-    parser.add_argument('--squeeze', action='store_true',
+    parent.add_argument('--squeeze', action='store_true',
                         help='Squeeze the output tensor before saving.')
 
     # use subparsers to group options for different applications
