@@ -95,8 +95,7 @@ def get_predict_kwargs(kwargs):
 
 def get_arg_parser():
     """argument parser to consume command line arguments"""
-    # root_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = ''
+    root_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser()
 
     # Create a parent parser for common arguments

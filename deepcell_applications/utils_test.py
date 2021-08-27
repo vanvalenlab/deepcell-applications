@@ -188,8 +188,9 @@ def test_get_arg_parser():
         ARGS = dca.utils.get_arg_parser().parse_args(input_list)
 
         args_dict = vars(ARGS)
-        # argparser adds '/private' to the front of the folder path
-        args_dict['output_directory'] = args_dict['output_directory'].split('/private')[1]
+        # argparser sometimes adds '/private` to the front of the path
+        if 'private' in args_dict['output_directory']:
+            args_dict['output_directory'] = args_dict['output_directory'].split('/private')[1]
 
         assert args_dict == output_dict
 
