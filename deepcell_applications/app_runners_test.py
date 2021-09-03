@@ -30,11 +30,15 @@ import tempfile
 import skimage.io as io
 import numpy as np
 
+import pytest
+
 import deepcell_applications as dca
 
 
 def test_run_app_mesmer(mocker):
     with tempfile.TemporaryDirectory() as temp_dir:
+        # run with default parameters
+
         # create required input files and directories
         img = np.zeros((10, 10))
         output_dir = os.path.join(temp_dir, 'output_dir')
@@ -48,7 +52,8 @@ def test_run_app_mesmer(mocker):
             def parse_args(self):
                 required_inputs = ['mesmer',
                                    '--output-directory', output_dir,
-                                   '--nuclear-image', img_path
+                                   '--nuclear-image', img_path,
+                                   '--squeeze'
                                    ]
                 formatted_args = dca.argparse.get_arg_parser().parse_args(required_inputs)
                 return formatted_args
@@ -57,3 +62,27 @@ def test_run_app_mesmer(mocker):
                      mocked_get_args_mesmer)
 
         dca.app_runners.run_application()
+
+        # error checking
+
+        # create required input files and directories
+        out_path = os.path.join(temp_dir, 'out_mask.tiff')
+        io.imsave(out_path, img)
+
+        # patch user supplied arguments
+        class mocked_get_args_mesmer_existing_file():
+            def parse_args(self):
+                required_inputs = ['mesmer',
+                                   '--output-directory', output_dir,
+                                   '--nuclear-image', img_path,
+                                   '--output-name', out_path,
+                                   '--squeeze'
+                                   ]
+                formatted_args = dca.argparse.get_arg_parser().parse_args(required_inputs)
+                return formatted_args
+
+        mocker.patch('deepcell_applications.app_runners.get_arg_parser',
+                     mocked_get_args_mesmer_existing_file)
+
+        with pytest.raises(IOError):
+            dca.app_runners.run_application()
