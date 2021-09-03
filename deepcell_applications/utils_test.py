@@ -26,14 +26,10 @@
 """Tests for deepcell_applications.utils"""
 
 import copy
-import os
 
 import numpy as np
-import skimage.io as io
 
-import argparse
 import pytest
-import tempfile
 
 import deepcell_applications as dca
 
@@ -141,75 +137,3 @@ def test_get_predict_kwargs(mocker):
         _ = dca.utils.get_predict_kwargs(bad_namespace)
 
 
-def test_get_arg_parser():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        img = np.zeros((10, 10))
-
-        # generate good paths
-        file_path = os.path.join(temp_dir, 'img.tiff')
-        dir_path = os.path.join(temp_dir, 'dir')
-
-        io.imsave(file_path, img)
-        os.makedirs(dir_path)
-
-        # generate bad paths
-        bad_file_path = os.path.join(temp_dir, 'fake_img.tiff')
-        bad_dir_path = os.path.join(temp_dir, 'fake_dir')
-
-        # create dict to hold expected outputs
-        output_dict = {
-            'app': 'mesmer',
-            'output_directory': dir_path,
-            'output_name': 'seg_mask.tif',
-            'log_level': 'INFO',
-            'squeeze': True,
-            'nuclear_path': file_path,
-            'nuclear_channel': [2],
-            'membrane_path': file_path,
-            'membrane_channel': [3],
-            'compartment': 'nuclear',
-            'image_mpp': 3.0,
-            'batch_size': 5}
-
-        # construct syntax for appropriate passing to argparse
-        input_list = [output_dict['app'],
-                      '--output-directory', output_dict['output_directory'],
-                      '--output-name', output_dict['output_name'],
-                      '--log-level', output_dict['log_level'],
-                      '--squeeze',
-                      '--nuclear-image', output_dict['nuclear_path'],
-                      '--nuclear-channel', str(output_dict['nuclear_channel'][0]),
-                      '--membrane-image', output_dict['membrane_path'],
-                      '--membrane-channel', str(output_dict['membrane_channel'][0]),
-                      '--compartment', output_dict['compartment'],
-                      '--image-mpp', str(int(output_dict['image_mpp'])),
-                      '--batch-size', str(output_dict['batch_size'])]
-
-        ARGS = dca.utils.get_arg_parser().parse_args(input_list)
-
-        args_dict = vars(ARGS)
-        # argparser sometimes adds '/private` to the front of the path
-        if 'private' in args_dict['output_directory']:
-            args_dict['output_directory'] = args_dict['output_directory'].split('/private')[1]
-
-        assert args_dict == output_dict
-
-        # I couldn't figure out the correct syntax to catch these errors
-        with pytest.raises(SystemExit):
-            # bad nuclear image path
-            _ = dca.utils.get_arg_parser().parse_args([output_dict['app'],
-                                                       '--nuclear-image', bad_file_path,
-                                                       '--output-directory', dir_path])
-
-        with pytest.raises(SystemExit):
-            # bad membrane image path
-            _ = dca.utils.get_arg_parser().parse_args([output_dict['app'],
-                                                       '--nuclear-image', file_path,
-                                                       '--membrane-image', bad_file_path,
-                                                       '--output-directory', dir_path])
-
-        with pytest.raises(argparse.ArgumentTypeError):
-            # bad output dir
-            _ = dca.utils.get_arg_parser().parse_args([output_dict['app'],
-                                                       '--nuclear-image', file_path,
-                                                       '--output-directory', bad_dir_path])

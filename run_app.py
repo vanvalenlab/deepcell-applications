@@ -25,7 +25,6 @@
 # ==============================================================================
 """An example script for Multiplex Segmentation using deepcell.applications."""
 
-import argparse
 import logging
 import os
 import sys
@@ -55,7 +54,7 @@ def initialize_logger(log_level):
 if __name__ == '__main__':
     _ = timeit.default_timer()
 
-    ARGS = get_arg_parser().parse_args()
+    ARGS = dca.argparse.get_arg_parser().parse_args()
 
     initialize_logger(log_level=ARGS.log_level)
 

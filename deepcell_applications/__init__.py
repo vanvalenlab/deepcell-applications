@@ -30,3 +30,4 @@ from deepcell_applications import io
 from deepcell_applications import prepare
 from deepcell_applications import settings
 from deepcell_applications import utils
+from deepcell_applications import argparse
