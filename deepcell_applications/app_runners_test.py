@@ -23,9 +23,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An example script for Multiplex Segmentation using deepcell.applications."""
+"""Tests for deepcell_applications.app_runners"""
+import os
+import tempfile
 
-from deepcell_applications.app_runners import run_application
+import skimage.io as io
+import numpy as np
 
-if __name__ == '__main__':
-    run_application()
+import deepcell_applications as dca
+
+
+def test_run_app_mesmer(mocker):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # create required input files and directories
+        img = np.zeros((10, 10))
+        output_dir = os.path.join(temp_dir, 'output_dir')
+        img_path = os.path.join(temp_dir, 'img.tiff')
+
+        io.imsave(img_path, img)
+        os.makedirs(output_dir)
+
+        # patch user supplied arguments
+        class mocked_get_args_mesmer():
+            def parse_args(self):
+                required_inputs = ['mesmer',
+                                   '--output-directory', output_dir,
+                                   '--nuclear-image', img_path
+                                   ]
+                formatted_args = dca.argparse.get_arg_parser().parse_args(required_inputs)
+                return formatted_args
+
+        mocker.patch('deepcell_applications.app_runners.get_arg_parser',
+                     mocked_get_args_mesmer)
+
+        dca.app_runners.run_application()
