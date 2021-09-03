@@ -25,7 +25,6 @@
 # ==============================================================================
 """Functions for instantiating and running Applications"""
 
-
 import deepcell_applications as dca
 
 
