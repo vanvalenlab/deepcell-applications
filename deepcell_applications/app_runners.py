@@ -24,52 +24,36 @@
 # limitations under the License.
 # ==============================================================================
 """Helper functions to run Applications"""
-import logging
 import os
-import sys
 import timeit
+
 
 import numpy as np
 import tifffile
 
 import deepcell_applications as dca
-from deepcell_applications.argparse import get_arg_parser
 
 
-def initialize_logger(log_level):
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+def run_application(arg_dict):
+    """Takes the user-supplied command line arguments and runs the specified application
 
-    log_level = getattr(logging, log_level)
+    Args:
+        arg_dict: dictionary of command line args
 
-    fmt = '[%(asctime)s]:[%(levelname)s]:[%(name)s]: %(message)s'
-    formatter = logging.Formatter(fmt=fmt)
-
-    console = logging.StreamHandler(stream=sys.stdout)
-    console.setFormatter(formatter)
-    console.setLevel(log_level)
-    logger.addHandler(console)
-
-
-def run_application():
+    Raises:
+        IOError: If specified output file already exists"""
     _ = timeit.default_timer()
 
-    ARGS = get_arg_parser().parse_args()
-
-    initialize_logger(log_level=ARGS.log_level)
-
-    OUTFILE = os.path.join(ARGS.output_directory, ARGS.output_name)
+    outfile = os.path.join(arg_dict['output_directory'], arg_dict['output_name'])
 
     # Check that the output path does not exist already
-    if os.path.exists(OUTFILE):
-        raise IOError(f'{OUTFILE} already exists!')
+    if os.path.exists(outfile):
+        raise IOError(f'{outfile} already exists!')
 
-    app = dca.utils.get_app(ARGS.app)
-
-    args_as_kwargs = dict(ARGS._get_kwargs())
+    app = dca.utils.get_app(arg_dict['app'])
 
     # load the input image
-    image = dca.prepare.prepare_input(ARGS.app, **args_as_kwargs)
+    image = dca.prepare.prepare_input(arg_dict['app'], **arg_dict)
 
     # make sure the input image is compatible with the app
     dca.utils.validate_input(app, image)
@@ -78,15 +62,15 @@ def run_application():
     image = np.expand_dims(image, axis=0)
 
     # run the prediction
-    kwargs = dca.utils.get_predict_kwargs(args_as_kwargs)
+    kwargs = dca.utils.get_predict_kwargs(arg_dict)
     output = app.predict(image, **kwargs)
 
     # Optionally squeeze the output
-    if ARGS.squeeze:
+    if arg_dict['squeeze']:
         output = np.squeeze(output)
 
     # save the output as a tiff
-    tifffile.imsave(OUTFILE, output)
+    tifffile.imsave(outfile, output)
 
     app.logger.info('Wrote output file %s in %s s.',
-                    OUTFILE, timeit.default_timer() - _)
+                    outfile, timeit.default_timer() - _)

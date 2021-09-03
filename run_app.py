@@ -23,9 +23,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""An example script for Multiplex Segmentation using deepcell.applications."""
+"""Top level script to run Applications."""
+import logging
+import os
+import sys
 
+from deepcell_applications.argparse import get_arg_parser
 from deepcell_applications.app_runners import run_application
 
+
+def initialize_logger(log_level):
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    log_level = getattr(logging, log_level)
+
+    fmt = '[%(asctime)s]:[%(levelname)s]:[%(name)s]: %(message)s'
+    formatter = logging.Formatter(fmt=fmt)
+
+    console = logging.StreamHandler(stream=sys.stdout)
+    console.setFormatter(formatter)
+    console.setLevel(log_level)
+    logger.addHandler(console)
+
+
 if __name__ == '__main__':
-    run_application()
+
+    # get command line args
+    ARGS = get_arg_parser().parse_args()
+
+    OUTFILE = os.path.join(ARGS.output_directory, ARGS.output_name)
+
+    initialize_logger(log_level=ARGS.log_level)
+
+    # run application
+    run_application(dict(ARGS._get_kwargs()))
