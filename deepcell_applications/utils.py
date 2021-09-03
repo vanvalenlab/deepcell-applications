@@ -26,7 +26,6 @@
 """Functions for instantiating and running Applications"""
 
 
-
 import deepcell_applications as dca
 
 
@@ -90,5 +89,3 @@ def get_predict_kwargs(kwargs):
             raise KeyError('{} is required for {} jobs, but is not found'
                            'in parsed CLI arguments.'.format(k, name))
     return predict_kwargs
-
-

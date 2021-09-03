@@ -135,5 +135,3 @@ def test_get_predict_kwargs(mocker):
         bad_namespace = copy.copy(mock_namespace)
         del bad_namespace['test']
         _ = dca.utils.get_predict_kwargs(bad_namespace)
-
-
