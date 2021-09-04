@@ -50,8 +50,7 @@ def test_run_app_mesmer(tmpdir):
     required_inputs = ['mesmer',
                        '--output-directory', output_dir,
                        '--nuclear-image', img_path,
-                       '--squeeze'
-                       ]
+                       '--squeeze']
     args = dca.argparse.get_arg_parser().parse_args(required_inputs)
 
     dca.app_runners.run_application(dict(args._get_kwargs()))
@@ -68,8 +67,7 @@ def test_run_app_mesmer(tmpdir):
                        '--output-directory', output_dir,
                        '--nuclear-image', img_path,
                        '--output-name', out_path,
-                       '--squeeze'
-                       ]
+                       '--squeeze']
     args_io_error = dca.argparse.get_arg_parser().parse_args(required_inputs)
 
     with pytest.raises(IOError):
