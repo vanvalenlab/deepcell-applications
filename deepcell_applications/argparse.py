@@ -120,7 +120,7 @@ def get_arg_parser():
                         help='Batch size for `model.predict`.')
 
     mesmer.add_argument('--compartment', '-c', default='whole-cell',
-                        choices=('nuclear', 'membrane', 'whole-cell'),
-                        help=('The cellular compartment to segment.'))
+                        choices=('nuclear', 'membrane', 'whole-cell', 'both'),
+                        help='The cellular compartment to segment.')
 
     return parser
