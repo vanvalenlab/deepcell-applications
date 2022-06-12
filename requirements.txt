@@ -1,3 +1,3 @@
-deepcell=0.12.2
+deepcell==0.12.2
 numpy
 tifffile
