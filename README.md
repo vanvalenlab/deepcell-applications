@@ -119,3 +119,10 @@ This makes it simple to build a CPU-only version of the image or to build a new 
 # the -gpu tag is required to enable GPU compatibility when overriding versions
 docker build --build-arg DEEPCELL_VERSION=0.9.0-gpu -t vanvalenlab/deepcell-applications .
 ```
+
+
+### Changes 20230301
+
+* Add `imagecodec` for compatibility with LZW-compressed images
+* Update `deepcell` requirement to `0.12.4`
+* Update `deepcell-tf` base to `0.12.4`
