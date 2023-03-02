@@ -2,3 +2,5 @@ deepcell==0.12.2
 numpy
 tifffile
 imagecodecs
+# Temporary patch - remove when deepcell version is bumped to 0.12.5 or greater
+scikit-image==0.19.3
