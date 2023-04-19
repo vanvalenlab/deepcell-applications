@@ -69,7 +69,7 @@ def run_application(arg_dict):
         output = np.squeeze(output)
 
     # save the output as a tiff
-    tifffile.imsave(outfile, output)
+    tifffile.imwrite(outfile, output)
 
     app.logger.info('Wrote output file %s in %s s.',
                     outfile, timeit.default_timer() - _)
